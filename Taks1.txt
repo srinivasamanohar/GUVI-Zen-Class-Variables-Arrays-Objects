@@ -1,0 +1,55 @@
+# Run the `kubectl top pods` command to get the CPU usage for each pod in the cluster
+$pod_cpu_usage = kubectl top pods --all-namespaces --containers | ConvertFrom-Csv | Select-Object -Property namespace, name, cpu
+
+# Group the pod CPU usage by deployment and sum the CPU usage for each deployment
+$deployment_cpu_usage = $pod_cpu_usage | ForEach-Object { "$($_.namespace)/$($_.name)".Split('-')[0] } | Group-Object | Select-Object -Property Name, @{ Name='Cpu'; Expression={ ($_.Group.cpu | Measure-Object -Sum).Sum } }
+
+# Sort the deployments by CPU usage and get the top 5
+$sorted_deployments = $deployment_cpu_usage | Sort-Object -Property Cpu -Descending | Select-Object -First 5
+
+# Print the list of top 5 deployments by CPU usage
+foreach ($deployment in $sorted_deployments) {
+    $deployment_name = $deployment.Name
+    $cpu_usage = $deployment.Cpu
+    Write-Host "$deployment_name: $cpu_usage"
+}
+
+
+az redis show --name <redis-name> --resource-group <resource-group-name> --ids $(az redis show --name <redis-name> --resource-group <resource-group-name> --query id --output tsv)/diagnostics \
+--query 'cacheMemoryUsage,cacheCPUUtilization,activeClientConnections'
+
+-----
+
+from azure.monitor.query import MetricsQueryClient
+from azure.identity import DefaultAzureCredential
+
+# Replace with your Azure subscription ID and Azure Cache for Redis resource ID
+subscription_id = 'your-subscription-id'
+resource_id = '/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Cache/Redis/{cache_name}'
+
+# Create an instance of the MetricsQueryClient class
+credential = DefaultAzureCredential()
+metrics_client = MetricsQueryClient(credential)
+
+# Define the metrics to retrieve
+metrics = [
+    'Server CPU',
+    'Memory Usage',
+    'Connected Clients'
+]
+
+# Define the time range for the metrics query (last 5 minutes in this example)
+from_date = datetime.datetime.now() - datetime.timedelta(minutes=5)
+to_date = datetime.datetime.now()
+
+# Execute the metrics query and retrieve the results
+result = metrics_client.query(resource_id, metrics, from_date, to_date, timespan=None, granularity='PT1M')
+
+# Process the metrics data
+for metric in result.metrics:
+    print('Metric:', metric.name.localized_value)
+    for time_series in metric.timeseries:
+        print('Time Series:')
+        for data_point in time_series.data:
+            print('Timestamp:', data_point.time_stamp)
+            print('Value:', data_point.average)
