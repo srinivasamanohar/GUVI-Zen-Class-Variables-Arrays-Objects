@@ -13,3 +13,7 @@ foreach ($deployment in $sorted_deployments) {
     $cpu_usage = $deployment.Cpu
     Write-Host "$deployment_name: $cpu_usage"
 }
+
+
+az redis show --name <redis-name> --resource-group <resource-group-name> --ids $(az redis show --name <redis-name> --resource-group <resource-group-name> --query id --output tsv)/diagnostics \
+--query 'cacheMemoryUsage,cacheCPUUtilization,activeClientConnections'
