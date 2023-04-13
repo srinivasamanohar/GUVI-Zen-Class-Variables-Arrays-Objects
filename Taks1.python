@@ -1,0 +1,45 @@
+from kubernetes import client, config
+
+# Load the Kubernetes configuration
+config.load_kube_config()
+
+# Create a Kubernetes API client
+api_client = client.CoreV1Api()
+
+# Get a list of all the namespaces in the cluster
+namespace_list = api_client.list_namespace()
+
+# Create a dictionary to store the CPU usage for each deployment
+deployment_cpu_usage = {}
+
+# Iterate over each namespace and get a list of its deployments
+for ns in namespace_list.items:
+    deployment_list = api_client.list_namespaced_deployment(namespace=ns.metadata.name)
+
+    # Iterate over the deployments and get their CPU usage
+    for deployment in deployment_list.items:
+        deployment_name = deployment.metadata.name
+        pods = api_client.list_namespaced_pod(namespace=ns.metadata.name, label_selector=f"app={deployment_name}")
+        cpu_usage = 0
+
+        # Iterate over the pods and get their CPU usage
+        for pod in pods.items:
+            pod_metrics = client.CustomObjectsApi().get_namespaced_custom_object(
+                group="metrics.k8s.io",
+                version="v1beta1",
+                namespace=ns.metadata.name,
+                plural="pods",
+                name=pod.metadata.name,
+            )
+            containers_metrics = pod_metrics["containers"]
+            for container in containers_metrics:
+                cpu_usage += int(container["usage"]["cpu"].replace("n", "")) // 10**6
+
+        deployment_cpu_usage[deployment_name] = cpu_usage
+
+# Sort the dictionary by CPU usage and get the top 5 deployments
+sorted_deployments = sorted(deployment_cpu_usage.items(), key=lambda x: x[1], reverse=True)[:5]
+
+# Print the list of top 5 deployments by CPU usage
+for deployment in sorted_deployments:
+    print(f"{deployment[0]}: {deployment[1]}")
