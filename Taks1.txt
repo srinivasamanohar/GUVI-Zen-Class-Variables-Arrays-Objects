@@ -77,39 +77,31 @@ done
 --------------
 from kubernetes import client, config
 
+# Load the Kubernetes configuration
 config.load_kube_config()
 
+# Create the Kubernetes API clients
 v1 = client.CoreV1Api()
-metrics_api = client.metrics_api.MetricsV1beta1Api()
-api = client.AppsV1Api()
+metrics_api = client.MetricsV1beta1Api()
+apps_api = client.AppsV1Api()
 
-# Replace <your-deployment-name> and <your-namespace> with the name and namespace of your deployment
+# Set the deployment name and namespace
 deploy_name = "<your-deployment-name>"
 namespace = "<your-namespace>"
 
 # Get the deployment object
-deploy = api.read_namespaced_deployment(
-    deploy_name,
-    namespace=namespace,
-)
+deploy = apps_api.read_namespaced_deployment(deploy_name, namespace=namespace)
 
 # Get the labels for the deployment
 labels = deploy.spec.selector.match_labels
 
 # Get the pods for the deployment
-pods = v1.list_namespaced_pod(
-    namespace=namespace,
-    label_selector=','.join([f"{k}={v}" for k, v in labels.items()]),
-)
+pods = v1.list_namespaced_pod(namespace=namespace, label_selector=','.join([f"{k}={v}" for k, v in labels.items()]))
 
 # Get the CPU and memory usage metrics for each pod
 for pod in pods.items:
     pod_name = pod.metadata.name
-    pod_metrics = metrics_api.list_namespaced_pod_metric(
-        namespace=namespace,
-        label_selector=','.join([f"{k}={v}" for k, v in labels.items()]),
-        pod_selector=f"metadata.name={pod_name}",
-    )
+    pod_metrics = metrics_api.list_namespaced_pod_metrics(namespace=namespace, label_selector=','.join([f"{k}={v}" for k, v in labels.items()]), field_selector=f"metadata.name={pod_name}")
 
     # Print the CPU and memory usage metrics for the pod
     print(f"Metrics for pod {pod_name}:")
