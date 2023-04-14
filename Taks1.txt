@@ -57,9 +57,12 @@ for metric in result.metrics:
 --------------------------------
 
 # Get the list of collections in your Azure Cosmos DB account
-az cosmosdb collection list --account-name <cosmosdb-account-name> --db-name <database-name> --query '[].id' -o tsv |
+collections=$(az cosmosdb collection list --account-name <cosmosdb-account-name> --db-name <database-name> --query "[].id" -o tsv)
+
 # Loop through each collection and get its RU consumption report
-while read collection; do
-    az cosmosdb collection show --collection-name "$collection" --account-name <cosmosdb-account-name> --db-name <database-name> --query 'resource.name,resource.offer.throughput,resource.offer.minimumThroughput,resource.offer.version,resource.offer.content.offerIsRUPerMinuteThroughputEnabled,resource.offer.content.currentRUPerMinuteThroughputSettings.maxThroughput' -o tsv
+for collection in $collections
+do
+    az cosmosdb collection show --account-name <cosmosdb-account-name> --db-name <database-name> --collection-name $collection --query "{'Collection Name': name, 'RU Consumption': statistics.usage.'ruConsumed', 'Total Requests': statistics.usage.'totalRequestUnits'}" -o table
 done
+
 
