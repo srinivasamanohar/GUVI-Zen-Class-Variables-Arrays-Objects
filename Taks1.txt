@@ -53,3 +53,13 @@ for metric in result.metrics:
         for data_point in time_series.data:
             print('Timestamp:', data_point.time_stamp)
             print('Value:', data_point.average)
+
+--------------------------------
+
+# Get the list of collections in your Azure Cosmos DB account
+az cosmosdb collection list --account-name <cosmosdb-account-name> --db-name <database-name> --query '[].id' -o tsv |
+# Loop through each collection and get its RU consumption report
+while read collection; do
+    az cosmosdb collection show --collection-name "$collection" --account-name <cosmosdb-account-name> --db-name <database-name> --query 'resource.name,resource.offer.throughput,resource.offer.minimumThroughput,resource.offer.version,resource.offer.content.offerIsRUPerMinuteThroughputEnabled,resource.offer.content.currentRUPerMinuteThroughputSettings.maxThroughput' -o tsv
+done
+
