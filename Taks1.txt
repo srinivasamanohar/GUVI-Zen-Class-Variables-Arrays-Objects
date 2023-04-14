@@ -55,13 +55,28 @@ for metric in result.metrics:
             print('Value:', data_point.average)
 
 --------------------------------
+---------------
+
+# Get the database ID for your Azure Cosmos DB account
+database_id=$(az cosmosdb show --name <cosmosdb-account-name> --resource-group <resource-group> --query "id")
+
 # Get the list of collections in your Azure Cosmos DB account
 collections=$(az cosmosdb collection list --account-name <cosmosdb-account-name> --db-name <database-name> --query "[].id" -o tsv)
 
 # Loop through each collection and get its RU consumption metrics
 for collection in $collections
 do
-    az monitor metrics list --resource /subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.DocumentDB/databaseAccounts/<cosmosdb-account-name>/databases/<database-name>/containers/$collection --metric "Total Request Units Consumed" --interval PT1H --start-time $(date +%Y-%m-%dT%H:%MZ -d '-1 hour') --end-time $(date +%Y-%m-%dT%H:%MZ) --aggregation Average --query "{Collection: dimensions[0].value, 'RU Consumption': average}" -o table
+    # Get the collection ID for the current collection
+    collection_id=$(az cosmosdb collection show --collection-name $collection --db-name <database-name> --account-name <cosmosdb-account-name> --query "resource.id")
+
+    # Get the RU consumption metrics for the current collection
+    az monitor metrics list --resource $database_id/collections/$collection_id --metric "Total Request Units Consumed" --interval PT1H --start-time $(date +%Y-%m-%dT%H:%MZ -d '-1 hour') --end-time $(date +%Y-%m-%dT%H:%MZ) --aggregation Average --query "{Collection: dimensions[0].value, 'RU Consumption': average}" -o table
 done
+
+
+
+
+
+
 
 
