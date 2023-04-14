@@ -137,9 +137,32 @@ for pod in pods.items:
         print(f" - Container {container.name}: CPU usage {container.usage['cpu']}, memory usage {container.usage['memory']}")
 
 
+---------------
 
 
+import subprocess
+import re
 
+# Define the command to retrieve the CPU usage of all pods in all namespaces
+cmd = ["kubectl", "top", "pod", "--all-namespaces"]
+
+# Run the command and capture the output
+output = subprocess.check_output(cmd).decode()
+
+# Parse the output and group the CPU usage by app
+cpu_usage_by_app = {}
+lines = output.strip().split('\n')
+for line in lines[1:]:
+    cols = re.split('\s+', line.strip())
+    app = cols[1].split('-')[0] # Extract the app name from the pod name
+    cpu_usage = cols[2]
+    if app not in cpu_usage_by_app:
+        cpu_usage_by_app[app] = 0
+    cpu_usage_by_app[app] += int(cpu_usage)
+
+# Print the total CPU usage for each app
+for app, cpu_usage in cpu_usage_by_app.items():
+    print(f"{app}: {cpu_usage}m")
 
 
 
