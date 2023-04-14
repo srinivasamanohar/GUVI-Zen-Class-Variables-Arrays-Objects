@@ -74,6 +74,52 @@ do
 done
 
 
+--------------
+
+from kubernetes import client, config
+
+config.load_kube_config()  # loads the default kubeconfig file
+
+v1 = client.CoreV1Api()
+api = client.CustomObjectsApi()
+
+# Replace <your-deployment-name> and <your-namespace> with the name and namespace of your deployment
+deploy_name = "<your-deployment-name>"
+namespace = "<your-namespace>"
+
+# Get the deployment object
+deploy = api.get_namespaced_custom_object(
+    group="apps",
+    version="v1",
+    namespace=namespace,
+    plural="deployments",
+    name=deploy_name,
+)
+
+# Get the labels for the deployment
+labels = deploy["spec"]["selector"]["matchLabels"]
+
+# Get the pods for the deployment
+pods = v1.list_namespaced_pod(
+    namespace=namespace,
+    label_selector=','.join([f"{k}={v}" for k, v in labels.items()]),
+)
+
+# Get the CPU and memory usage metrics for each pod
+for pod in pods.items:
+    pod_name = pod.metadata.name
+    pod_metrics = v1.top_pod(
+        pod_name,
+        namespace=namespace,
+        container="",
+    )
+
+    # Print the CPU and memory usage metrics for the pod
+    print(f"Metrics for pod {pod_name}:")
+    for container in pod_metrics.containers:
+        print(f" - Container {container.name}: CPU usage {container.usage['cpu']}, memory usage {container.usage['memory']}")
+
+
 
 
 
