@@ -75,29 +75,25 @@ done
 
 
 --------------
-
 from kubernetes import client, config
 
 config.load_kube_config()  # loads the default kubeconfig file
 
 v1 = client.CoreV1Api()
-api = client.CustomObjectsApi()
+api = client.AppsV1Api()
 
 # Replace <your-deployment-name> and <your-namespace> with the name and namespace of your deployment
 deploy_name = "<your-deployment-name>"
 namespace = "<your-namespace>"
 
 # Get the deployment object
-deploy = api.get_namespaced_custom_object(
-    group="apps",
-    version="v1",
+deploy = api.read_namespaced_deployment(
+    deploy_name,
     namespace=namespace,
-    plural="deployments",
-    name=deploy_name,
 )
 
 # Get the labels for the deployment
-labels = deploy["spec"]["selector"]["matchLabels"]
+labels = deploy.spec.selector.match_labels
 
 # Get the pods for the deployment
 pods = v1.list_namespaced_pod(
