@@ -163,6 +163,11 @@ for line in lines[1:]:
 # Print the total CPU usage for each app
 for app, cpu_usage in cpu_usage_by_app.items():
     print(f"{app}: {cpu_usage}m")
+    
+
+
+kubectl get pods -o 'custom-columns=NAME:.metadata.name,CPU:.spec.containers[*].usage.cpu,MEMORY:.spec.containers[*].usage.memory,ANNOTATIONS:.metadata.annotations' | kubectl top pods
+
 
 
 
