@@ -187,6 +187,6 @@ df_sum = df.groupby('Class')['Number of Students'].sum()
 # Print the resulting data frame
 print(df_sum)
 
-
+df_sum.to_csv('output.txt', header=True, index=True, sep='\t')
 
 
