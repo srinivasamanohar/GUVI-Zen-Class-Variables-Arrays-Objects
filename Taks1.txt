@@ -202,7 +202,7 @@ from kubernetes import client, config
 config.load_kube_config()
 
 # Create a Kubernetes API client
-api_client = client.CoreV1Api()
+api_client = client.AppsV1Api()
 
 # Get all namespaces
 namespaces = api_client.list_namespace()
@@ -212,15 +212,15 @@ for namespace in namespaces.items:
     namespace_name = namespace.metadata.name
     print("Namespace:", namespace_name)
 
-    # Get all pods in the namespace
-    pods = api_client.list_namespaced_pod(namespace_name)
+    # Get all deployments in the namespace
+    deployments = api_client.list_namespaced_deployment(namespace_name)
 
-    # Loop through each pod
-    for pod in pods.items:
-        pod_name = pod.metadata.name
-        pod_replicas = pod.spec.replicas
-        if pod_replicas and pod_replicas > 4:
-            print(f"Pod {pod_name} in namespace {namespace_name} has {pod_replicas} replicas.")
+    # Loop through each deployment
+    for deployment in deployments.items:
+        deployment_name = deployment.metadata.name
+        deployment_replicas = deployment.spec.replicas
+        if deployment_replicas and deployment_replicas > 4:
+            print(f"Deployment {deployment_name} in namespace {namespace_name} has {deployment_replicas} replicas.")
 
 
 
