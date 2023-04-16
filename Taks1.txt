@@ -193,4 +193,35 @@ print(df_sum)
 
 df_sum.to_csv('output.txt', header=True, index=True, sep='\t')
 
+----------------
+Pods Scaled more than 4
+
+from kubernetes import client, config
+
+# Load the Kubernetes configuration
+config.load_kube_config()
+
+# Create a Kubernetes API client
+api_client = client.CoreV1Api()
+
+# Get all namespaces
+namespaces = api_client.list_namespace()
+
+# Loop through each namespace
+for namespace in namespaces.items:
+    namespace_name = namespace.metadata.name
+    print("Namespace:", namespace_name)
+
+    # Get all pods in the namespace
+    pods = api_client.list_namespaced_pod(namespace_name)
+
+    # Loop through each pod
+    for pod in pods.items:
+        pod_name = pod.metadata.name
+        pod_replicas = pod.spec.replicas
+        if pod_replicas and pod_replicas > 4:
+            print(f"Pod {pod_name} in namespace {namespace_name} has {pod_replicas} replicas.")
+
+
+
 
