@@ -179,6 +179,7 @@ df = pd.DataFrame({
 })
 
 # Extract the class name without the last two substrings
+df['Number of Students'] = df['Number of Students'].str.rstrip('s').astype(int)
 df['Class'] = df['Class Name'].str.split('-', n=2).str[:2].str.join('-')
 
 df['Class'] = df['Class Name'].apply(lambda x: '-'.join(x.split('-')[:-2]))
