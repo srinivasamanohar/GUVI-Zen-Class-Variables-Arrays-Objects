@@ -252,3 +252,6 @@ df['timestamp'] = df['timestamp'].apply(lambda x: convert_to_ist(x))
 print(df)
 
 
+with open("output.txt", "w") as f:
+    f.write(df.to_string(index=False))
+
