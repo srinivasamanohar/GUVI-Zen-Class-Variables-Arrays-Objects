@@ -223,6 +223,6 @@ for namespace in namespaces.items:
             print(f"Deployment {deployment_name} in namespace {namespace_name} has {deployment_replicas} replicas.")
 
 
-az monitor metrics list --resource <resource-id> --metric <metric-name> --interval PT1M --start-time "$(date -u +%Y-%m-%dT%H:%M:%SZ --date '-10 minutes')" --end-time "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+az monitor metrics list --resource <resource-id> --metric <metric-name> --interval PT1M --start-time "$(date -u +%Y-%m-%dT%H:%M:%SZ --date '-10 minutes')" --end-time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --output table --query "value[].timeseries[].data[].{Time: strftime('%Y-%m-%d %H:%M:%S', gmtime(./time/1000 + (5 * 3600))), Value: average}"
 
 
