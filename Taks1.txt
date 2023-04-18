@@ -254,4 +254,45 @@ print(df)
 
 with open("output.txt", "w") as f:
     f.write(df.to_string(index=False))
+--------------
+
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# Assume we have an existing HTML document stored in the 'html_document' variable
+
+# Parse the HTML document using BeautifulSoup
+soup = BeautifulSoup(html_document, 'html.parser')
+
+# Find the <body> tag in the HTML document
+body_tag = soup.find('body')
+
+# Create a pandas dataframe
+df = pd.DataFrame({
+    'Full Name': ['Vincent Williamson', 'John Doe'],
+    'Age': [31, 42],
+    'Job Title': ['iOS Developer', 'Data Scientist'],
+    'Location': ['Washington', 'New York']
+})
+
+# Generate the dynamic HTML code as described in the previous answer
+header_row = ''.join(['<div class="cell">{}</div>'.format(col_name) for col_name in df.columns])
+header_html = '<div class="row header">{}</div>'.format(header_row)
+data_rows = []
+for index, row in df.iterrows():
+    data_row = ''.join(['<div class="cell" data-title="{}">{}</div>'.format(col_name, row[col_name]) for col_name in df.columns])
+    data_rows.append('<div class="row">{}</div>'.format(data_row))
+data_html = ''.join(data_rows)
+html_code = '<div class="limiter"><div class="container-table100"><div class="wrap-table100"><div class="table">{}</div></div></div></div>'.format(header_html + data_html)
+
+# Convert the dynamic HTML code into a BeautifulSoup object
+dynamic_soup = BeautifulSoup(html_code, 'html.parser')
+
+# Insert the dynamic HTML code into the <body> tag
+body_tag.append(dynamic_soup)
+
+# Convert the modified HTML document back into a string
+modified_html_document = str(soup)
+
+
 
