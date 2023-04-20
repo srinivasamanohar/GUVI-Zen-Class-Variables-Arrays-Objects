@@ -295,4 +295,31 @@ body_tag.append(dynamic_soup)
 modified_html_document = str(soup)
 
 
+--------------
+
+
+from selenium import webdriver
+
+# Set the path to your local HTML file
+html_file_path = "/path/to/local/file.html"
+
+# Configure the webdriver to use the Chrome browser
+driver = webdriver.Chrome()
+
+# Load the local HTML file in the browser
+driver.get("file://" + html_file_path)
+
+# Wait for the page to fully load
+driver.implicitly_wait(10)
+
+# Take a screenshot of the webpage and save it as a PNG file
+driver.save_screenshot("screenshot.png")
+
+# Close the browser
+driver.quit()
+
+
+
+
+
 
