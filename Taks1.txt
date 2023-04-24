@@ -330,3 +330,5 @@ driver.quit()
 https://github.com/kubernetes-client/python
 
 
+$_.Split("`t")[0] + "=" + $_.Split("`t")[1]
+
