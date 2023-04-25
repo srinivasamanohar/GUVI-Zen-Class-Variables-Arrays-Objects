@@ -332,3 +332,31 @@ https://github.com/kubernetes-client/python
 
 $_.Split("`t")[0] + "=" + $_.Split("`t")[1]
 
+----------------------
+
+ # App Configuration task
+ 
+ 
+# Set the variables for the Azure App Configuration and Kubernetes ConfigMap
+$AppConfigEndpoint = "https://<app-config-name>.azconfig.io"
+$AppConfigKey = "<app-config-key>"
+$ConfigMapName = "<configmap-name>"
+$Namespace = "<namespace>"
+
+# Fetch the key-value pairs from Azure App Configuration using the Azure CLI
+$KeyValuePairs = az appconfig kv list --endpoint $AppConfigEndpoint --key $AppConfigKey --all | ConvertFrom-Json | foreach { $_.name + "=" + $_.value }
+
+# Build the data string for the ConfigMap using the key-value pairs
+$DataString = ""
+foreach ($KeyValuePair in $KeyValuePairs) {
+    $DataString += "`n$KeyValuePair"
+}
+
+# Remove the first newline character from the data string
+$DataString = $DataString.TrimStart("`n")
+
+# Update the ConfigMap with the new data using kubectl
+kubectl patch configmap $ConfigMapName -n $Namespace --type merge --patch "`"{\"data\":{\"$DataString\"}}`""
+
+# Verify that the ConfigMap was updated
+kubectl get configmap $ConfigMapName -n $Namespace
