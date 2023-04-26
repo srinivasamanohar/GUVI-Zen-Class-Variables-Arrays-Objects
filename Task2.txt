@@ -1,0 +1,18 @@
+data "local_file" "policy_ids" {
+  filename = "${path.module}/policies/policy_ids.json"
+}
+
+resource "azurerm_policy_set_definition" "example" {
+  name                = "example"
+  policy_type         = "Custom"
+  display_name        = "Example Policy Set Definition"
+  description         = "An example policy set definition"
+  management_group_id = var.management_group_id
+
+  dynamic "policy_definition_reference" {
+    for_each = jsondecode(data.local_file.policy_ids.content)["policy_ids"]
+    content {
+      policy_definition_id = policy_definition_reference.value
+    }
+  }
+}
