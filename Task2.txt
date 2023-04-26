@@ -16,3 +16,13 @@ resource "azurerm_policy_set_definition" "example" {
     }
   }
 }
+
+
+
+ dynamic "policy_definition_reference" {
+    for_each = fileset("${path.module}/policies", "*.json")
+
+    content {
+      policy_definition_id = jsondecode(file("${path.module}/policies/${policy_definition_reference.value}"))
+    }
+  }
