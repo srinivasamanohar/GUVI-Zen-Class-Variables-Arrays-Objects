@@ -360,3 +360,28 @@ kubectl patch configmap $ConfigMapName -n $Namespace --type merge --patch "`"{\"
 
 # Verify that the ConfigMap was updated
 kubectl get configmap $ConfigMapName -n $Namespace
+
+
+------------------
+
+
+
+import smtplib
+
+# create SMTP session
+s = smtplib.SMTP('smtp.gmail.com', 587)
+
+# start TLS for security
+s.starttls()
+
+# login with credentials
+s.login("@gmail.com", "")
+
+# message to be sent
+message = "Helo this message is from Laravel!"
+
+# send email
+s.sendmail("laravelf@gmail.com", "manoharkandadai@gmail.com", message)
+
+# terminate session
+s.quit()
