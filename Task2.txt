@@ -26,3 +26,12 @@ resource "azurerm_policy_set_definition" "example" {
       policy_definition_id = jsondecode(file("${path.module}/policies/${policy_definition_reference.value}"))
     }
   }
+
+
+-----------------------
+$identityEndpoint = $env.IDENTITY_ENDPOINT
+$identityHeader = $env.IDENTITY_HEADER
+
+$accessToken = Invoke-RestMethod -Method GET -Headers @{Metadata=$identityHeader} -Uri $identityEndpoint?resource=https://management.azure.com/ -UseBasicParsing | Select-Object -ExpandProperty access_token
+
+az login --identity -u $accessToken
