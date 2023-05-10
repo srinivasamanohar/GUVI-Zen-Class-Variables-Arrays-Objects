@@ -37,6 +37,29 @@ az monitor metrics list \
   --aggregation "Average" \
   --interval PT5M \
   --query "value[0].timeseries[0].data[0].average"
+  
+  
+-------------------------------------------
 
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: agent-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agent-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: External
+    external:
+      metric:
+        name: job_queue_length
+        selector:
+          matchLabels:
+            metric_name: job_queue_length
+      targetValue: "5"
 
 
