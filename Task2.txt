@@ -61,5 +61,9 @@ spec:
           matchLabels:
             metric_name: job_queue_length
       targetValue: "5"
+------------------------
 
+
+
+$configMap = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetString([System.Convert]::FromBase64String($encodedConfigMap))
 
