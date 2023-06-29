@@ -385,3 +385,58 @@ s.sendmail("laravelf@gmail.com", "manoharkandadai@gmail.com", message)
 
 # terminate session
 s.quit()
+
+
+----------------
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Activity Table</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <th>Type of Activity</th>
+      <th>Values</th>
+    </tr>
+    <tr>
+      <td>Activity 1</td>
+      <td>Value 1</td>
+    </tr>
+    <tr>
+      <td>Activity 2</td>
+      <td>Value 2</td>
+    </tr>
+    <tr>
+      <td>Activity 3</td>
+      <td>Value 3</td>
+    </tr>
+    <!-- Add more rows as needed -->
+  </table>
+</body>
+</html>
+You can customize the table by adding more rows and modifying the values in the "Type of Activity" and "Values" columns. Feel free to adjust the styling and structure of the table according to your specific requirements.
+
+
+
+
+
+
